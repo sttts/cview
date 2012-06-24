@@ -1,0 +1,35 @@
+all : builder.exe\
+	demo.exe\
+	color1.exe\
+	ex1.exe\
+	ex2.exe\
+	ex3.exe\
+	ttfview.exe
+
+INCLUDE_DIRS = ../include ../../allegttf/include
+LIBRARY_DIRS = ../lib ../../allegttf/lib
+LIBRARIES = cview alttf alleg stdcx
+
+#----------------------------------------------------------------------------
+CC = gcc
+
+OPTIONS = \
+	-O2\
+	-W\
+	-Wall\
+	-s
+
+INC_DIRS = $(addprefix -I,$(INCLUDE_DIRS))
+LIB_DIRS = $(addprefix -L,$(LIBRARY_DIRS))
+LIBS = $(addprefix -l,$(LIBRARIES))
+
+%exe : %o
+	$(CC) $(LIB_DIRS) -s -o $@ $< $(LIBS)
+
+%o : %cc
+	$(CC) -c $(INC_DIRS) $(OPTIONS) $<
+
+%o : %c
+	$(CC) -c $(INC_DIRS) $(OPTIONS) $<
+
+

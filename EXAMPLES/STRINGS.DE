@@ -1,0 +1,41 @@
+0 Ok
+1 Abbrechen
+2 Ja
+3 Nein
+4 Wiederholen
+5 Ignorieren
+6 Datei oder Pfad ungültig.
+7 Datei muß existieren.
+8 Keine Datei angegeben.
+9 Laufwerkswechsel ist nicht erlaubt.
+10 Ungültiges Laufwerk.
+11 Pfadwechsel ist nicht erlaubt.
+12 Keine eigenen Dateitypen erlaubt.
+13 Verzeichnis konnte nicht erstellt werden.
+14 Information
+15 Verzeichnis erstellen
+16 Verzeichnis
+17 Best,tigung
+18 Soll die Datei %s gelöscht werden?
+19 Datei konnte nicht gelöscht werden.
+100 Datei
+101 Neu
+102 Öffnen...
+103 Speichern
+104 Speichern als...
+109 Beenden
+110 Bearbeiten
+111 Ausschneiden
+112 Kopieren
+113 Einfügen
+120 Ansicht
+190 Hilfe
+191 Inhalt
+192 Info
+300 Videomodus
+301 Wollen sie den neuen Videomodus behalten?
+302 Videomodus
+303 Änderung des Videomodus ist nicht möglich.
+400 Datei Öffnen
+401 Öffnen
+500 Dies sollte ein sehr langer Text sein, der automatisch umgebrochen werden sollte, damit er in ein Fenster paßt. Das Fenster wird entsprechend skaliert, so daß die Breite immer gleich bleibt.

@@ -1,0 +1,26 @@
+WIP 1 - 01/30/98:
+ - first release
+
+WIP 2 - 01/31/98
+ - v_strings.h replaced with v_string.h
+ - CScrollBar uses butMultiEvent for buttons
+ - Top window's title is highlighted
+ - German and English strings.inf included
+ - strings.inf doesn't need dummy entry at the end anymore
+ - CPicture supports tiled and centered bitmaps
+
+WIP 3 - 05/22/98
+ - Color depth with more than 8 bits are possible
+ - errors in CFileDlg removed
+ - CProgram::BackgroundAction added to support asynchronous calculation 
+   (polling of Allegro stream functions for example)
+ - Spanish version of strings.inf included
+
+WIP 4 - 09/28/98
+ - Color depth changable on the fly
+ - Menu drawing code sped up
+ - CView now makes *no* restriction on the palette and will use the best colors
+   possible for system bitmaps etc.
+ - On the fly changable dialog and menu styles
+ - Started working on gui builder
+

@@ -1,0 +1,7 @@
+CDialog Pffe96204
+TitleText "Title" TitleCentered 0 Close ffece204 Flags 13 DrawingType 1 BufferType 1 px 78 py 85 sx 112 sy 112 Value 0 ScaleMode 0 ScaleModeOffset 0 Transparent 0 
+ CTextButton Pffe92204
+ Text "Button" Flags 0 Command 2 Target 0 px 8 py 28 sx 46 sy 18 Value 0 ScaleMode 0 ScaleModeOffset 0 Transparent 0 
+ CGroupEnd P%p
+ 
+ 

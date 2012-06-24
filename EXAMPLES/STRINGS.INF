@@ -1,0 +1,41 @@
+0 &Ok
+1 &Cancel
+2 &Yes
+3 &No
+4 &Repeat
+5 &Ignore
+6 Invalid file or path.
+7 File must exist.
+8 File must be entered.
+9 Drive change not allowed.
+10 Invalid drive.
+11 Path change not allowed.
+12 No individual file types allowed.
+13 Couldn't create directory.
+14 Information
+15 Make directory
+16 Directory
+17 Best,tigung
+18 Should file %s be deleted?
+19 Couldn't delete file.
+100 &File
+101 &New
+102 &Open...
+103 &Save
+104 Save &as...
+109 &Quit
+110 &Edit
+111 &Cut
+112 &Copy
+113 &Paste
+120 &View
+190 &Help
+191 &Contents
+192 &Info
+300 &Video mode
+301 Do you want to keep current video mode?
+302 &Video mode
+303 Video mode changed not possible.
+400 Open file
+401 &Open
+500 This should be a very long text, that needs more than one line to be displayed in a CText object.

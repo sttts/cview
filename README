@@ -1,0 +1,859 @@
+    _______   _    __ __
+   /\  ___ \/\ \  /| |\_\
+   \ \ \_/\_\ \ \ || |/_/
+    \ \ \\/_/\ \ \|| |  __     __  __        __
+     \ \ \   _\ \ \| | /\ \  /'__'\\ \  /\  / /
+      \ \ \__\ \ \   | \ \ \/\  __/ \ \/  \/ /
+       \ \______\ \__|  \ \_\ \____\ \__/\__/
+        \/______/\/__/   \/_/\/____/\/__\/_/ 
+
+           A window library for Allegro
+
+ By Stefan Schimanski & Janko Heilgeist '1997/1998
+
+
+
+   "I do not accept responsibility for any effects, adverse or otherwise, 
+    that this code may have on you, your computer, your sanity, your dog, 
+    and anything else that you can think of. Use it at your own risk."
+
+
+
+
+======================================
+============ Requirements ============
+======================================
+
+To use this version of CView you need Allegro 2.2 or higher (tested with 2.2
+and 3.0).
+
+For information about Allegro:
+
+shawn@talula.demon.co.uk
+http://www.talula.demon.co.uk/
+
+
+=====================================
+============ Using CView ============
+=====================================
+
+All CView classes are defined in view.h. You should include it in your
+programs and link with libview.a.
+
+
+void View_Init();
+   Initialize the CView class library. You have to call it only once before
+   the first use of any CView class.
+
+
+void View_Done();
+   Closes down the CView class library. It should be called once when you exit
+   your program.
+
+
+int ExecuteWindow(class CWindow *Win, aForeground=0);
+   The given window is inserted in program and the run method is called with
+   aForeground as argument. When Run returns the window is remove from the
+   program. But it's not destroyed! ExecuteWindow return the return value of
+   the Run method.
+
+
+=================================
+============ Dialogs ============
+=================================
+
+CView provides powerfull classes to create dialogs you know from other
+graphical user interface. A dialog consists of an instance of CDialog
+that can contains as many sub views as you like. There are special
+classes for use in dialogs:
+
+
+
+
+=========================================
+============ Class hierarchy ============
+=========================================
+
+
+CView-+-CBufView---CGroup---CWindow-+-CProgram
+      |                             |
+      |                             +-CDialog-+-CMessageBox
+      |                             |         |
+      |                             |         +-CInputBox
+      |                             |         |
+      |                             |         +-CFileDlg---CFileSelector
+      |                             |
+      |                             +-CMenu-+-CMenuBar
+      |                             |       |
+      |                             |       +-CPopupMenu
+      |                             |
+      |                             +-CComboBox
+      |
+      +-CButton-+-CPicButton
+      |         |
+      |         +-CTextButton
+      |         |
+      |         +-CTransButton
+      |         |
+      |         +-CSystemBitmapButton
+      |
+      +-CRadioButton
+      |
+      +-CCheckbox
+      |
+      +-CText
+      |
+      +-CPicture
+      |
+      +-C3dIn
+      |
+      +-C3dOut
+      |
+      +-CList---CListbox
+      |
+      +-CProcessBar
+      |
+      +-CFilledRect
+
+
+===============================
+============ CView ============
+===============================
+
+class CView
+{
+  CView(int apx, int apy, int asx, int asy)
+  virtual ~CView();
+
+  virtual void HandleMouse(int mx, int my, int buttons);
+  virtual void MouseLost(int mx, int my, int buttons);
+  virtual void MouseGot(int mx, int my, int buttons);
+  virtual void HandleEvent(int Event, int Data=0);
+  virtual void HandleKey(char Char, char Scancode);
+  virtual int IsIn(int x, int y);
+  virtual int IsIn(int ax, int ay, int bx, int by);
+
+  virtual void PrepareDraw();
+  virtual void Draw();
+  virtual void Redraw();
+  virtual void Action();
+
+  virtual int Focus();
+  virtual int DeFocus();
+  void Drag(int mx=0, int my=0);
+  void Drop();
+  void Kill();
+
+  class CGroup *Owner;
+  CView *Next, *Prev;
+  int SentencedToDeath;
+
+  void Move(int x,int y);
+  void Scale(int x, int y);
+  virtual void MoveTo(int x, int y);
+  virtual void ScaleTo(int x, int y);
+  inline int Height() { return sy; }
+  inline int Width() { return sx; }
+  inline int Posx() { return px; }
+  inline int Posy() { return py; }
+  virtual char Color(int Num);
+  void MakeLocal(int &x, int &y, CView *Origin);
+  void MakeGlobal(int &x, int &y, CView *Target);
+  void SetScaleMode(int aScaleMode);
+  virtual BITMAP *GetMouse(int &rx, int &ry);
+  void SetMouse(BITMAP *aMouse, int rx=0, int ry=0);
+};
+
+
+
+CView is the base class of the class library. It contains all methods
+that are needed to handle events, to be display on the screen and to
+be included in CGroup instance like the main program.
+
+
+Constructor CView_CView(int apx, int apy, int asx, int asy);
+   Constructor of CView. The parameter define the psoition relative to
+   the owner's view space and the size of the view object.
+
+
+Destructor CView_Destructor
+   Destructor of CView. The view object is automatically removed from
+   the owner object.
+
+
+virtual void CView_HandleMouse(int mx, int my, int buttons);
+   It's called when the mouse cursor in inside the view object and one
+   of the parameters have changed. (mx;my) is relative to the owner's
+   view space. buttons contain the status of the button.
+
+butLeft (1): Button A
+butRight (2): Button B
+
+If a double click occured buttons is or'ed with butDouble. You can also use
+butDoubleLeft and butDoubleRight.
+
+
+virtual void CView_MouseLost(int mx, int my, int buttons);
+   When the mouse cursor has moved out of the view object, this method
+   is called. (mx;my) is relative to the owner's
+   view space. buttons contain the status of the button.
+
+butLeft (1): Button A
+butRight (2): Button B
+
+
+virtual void CView_MouseGot(int mx, int my, int buttons);
+   It's called when the mouse cursor was moved into the view object. (mx;my) is relative to the owner's
+   view space. buttons contain the status of the button.
+
+butLeft (1): Button A
+butRight (2): Button B
+
+
+virtual void CView_HandleEvent(int Event, int Data=0);
+   The owner calls the HandleEvent methods of all children when an Event
+   arrives. The meaning of Data is different for every event.
+
+
+virtual void CView_HandleKey(char Char, char Scancode);
+   If the view object has the focus HandleKey is called for every key
+   press.
+
+
+virtual int CView_IsIn(int x, int y);
+virtual int CView_IsIn(int ax, int ay, int bx, int by);
+   Returns 1 if (x;y) or the given rectangle is inside the view object. 
+   All positions are relative to the owner's view space.
+
+
+virtual void CView_PrepareDraw();
+   It's called by the owner before a draw of all children is started. If the view object
+   have to find out which part should be redrawn, it should call the owner's
+   Update method here.
+
+
+virtual void CView_Draw();
+   After PrepareDraw() has been called, the owner calls the draw methods
+   of its children. It is not allowed to change to clipping area of the
+   owner's buffer. It is only called when the owner's update procedure
+   has been called.
+
+
+virtual void CView_Redraw();
+   For normal CView objects Redraw() calls Draw(). In CGroup it calls
+   the draw method of all children to restore the right appearance.
+
+
+virtual void CView_Action();
+   The action method of any view object is called with a constant frequency.
+   Normaly it's 40 Hz.
+
+
+virtual int CView_Focus();
+   Focus is called when a view object should get the focus. It returns
+   wether it was successfull.
+
+
+virtual int CView_DeFocus();
+   If a object has the focus DeFocus() is called when it should return
+   the focus. It return 1 if it has been successfull.
+
+
+void CView_Drag(int mx=0, int my=0);
+   Drag makes the view objects to the dragged object that gets all mouse
+   events until Drop() is called. (mx;my) is from the mouse position.
+
+
+void CView_Drop();
+   Drop stops the dragging of the view object.
+
+
+void CView_Kill();
+   If a view should be removed, Kill has to be called. The view isn't
+   removed immediately, but later in the action method of the owner. That
+   is important because some methods won't work if a view is simply
+   removed.
+
+
+class CGroup *CView_Owner;
+   Owner is a pointer to the owner group.
+
+
+CView *CView_Next;
+   Contains a pointer to the next view object in the linked list.
+
+
+CView *CView_Prev;
+   Contains a pointer to the previous view object in the linked list.
+
+
+int CView_SentencedToDeath;
+   If a view object should be remove from a group, this variable is set
+   to 1.
+
+
+void CView_Move(int x,int y);
+   Moves the view object without the needed redraw. (x;y) is the moving
+   vector, not the absolute position.
+
+
+void CView_Scale(int x, int y);
+   Scales the view object without the needed redraw. (x;y) is the scale
+   vector, not the absolute position.
+
+
+virtual void CView_MoveTo(int x, int y);
+   Moves the view object to a new absolute position relative to the
+   owner's view space without the needed Redraw.
+
+
+virtual void CView_ScaleTo(int x, int y);
+   Scales the view object to a new absolute size without the needed
+   redraw.
+
+
+inline int CView_Height() { return sy; }
+   Returns the height of the view object.
+
+
+inline int CView_Width() { return sx; }
+   Returns the width of the view object.
+
+
+inline int CView_Posx() { return px; }
+   Returns the x position of the view object relative to the owner's
+   view space.
+
+
+inline int CView_Posy() { return py; }
+   Returns the y position of the view object relative to the owner's
+   view space.
+
+
+virtual char CView_Color(int Num);
+   Returns the color Num from the view's palette. It can be overwritten
+   to change the colors of view object.
+
+
+void CView_MakeLocal(int &x, int &y, CView *Origin);
+   Convert (x;y) to the local view space. Origin is the old relative
+   view space before the transformation. If a point should be converted
+   to the view space of a child view space, this method should be used.
+
+
+void CView_MakeGlobal(int &x, int &y, CView *Target);
+   Convert (x;y) to the global view space. Target is the new relative
+   view space. If a point should be converted
+   to the view space of a owner view space, this method should be used.
+
+
+void CView_SetScaleMode(int aScaleMode);
+   Normally the distance between the left and the upper border of the owner
+   is constant for all sides of the view object. With this function
+   the distance to the right and bottom border can be made constant by
+   setting the right bits.
+
+const sclLeft;
+const sclRight;
+const sclTop;
+const sclBottom;
+
+
+virtual BITMAP *CView_GetMouse(int &rx, int &ry);
+   Returns the mouse cursor that should be displayed in the view object.
+   (rx;ry) defines the focus point in the mouse cursor.
+
+
+void CView_SetMouse(BITMAP *aMouse, int rx=0, int ry=0);
+   This function can be used to define a new mouse cursor for this
+   view object. (rx;ry) defines the focus point in the mouse cursor.
+
+
+==================================
+============ CBufView ============
+==================================
+
+
+class CBufView:public CView
+{
+  CBufView(int apx, int apy, int asx, int asy);
+  virtual ~CBufView();
+
+  virtual void Draw();
+  virtual void Redraw();
+  virtual void Update(int ax, int ay, int asx, int asy);
+  virtual void ScaleTo(int x, int y);
+  virtual void CreateBuffer();
+  inline BITMAP *GetBuffer() {if (!Buffer) CreateBuffer(); return Buffer;}
+  inline void SetBuffer(BITMAP *Buf) {Buffer=Buf;}
+};
+
+
+
+CBufView is the base class for all buffered view classes. When the draw
+method is called only the buffer is drawn into the buffer of the owner.
+This is normally faster than a full redraw.
+
+
+Constructor CBufView_CBufView(int apx, int apy, int asx, int asy);
+   Constructor of CBufView. Creates the BufView object by calling CView.
+   Furthermore a buffer is created.
+
+
+Destructor CBufView_Destructor
+   Destructor of CBufView. The buffer is automatically destroyed.
+
+
+virtual void CBufView_Draw();
+   Instead of a full redraw only the buffer is drawn into the owner.
+
+
+virtual void CBufView_Redraw();
+   Calls the owner's update method to be redrawn.
+
+
+virtual void CBufView_Update(int ax, int ay, int asx, int asy);
+   Blit the buffer into the owner and calls the owner's update method.
+
+
+virtual void CBufView_ScaleTo(int x, int y);
+   Call CView's ScaleTo and recreates the buffer with the new size.
+   Furthermore the next draw call will automatically call the redraw
+   method.
+
+
+virtual void CBufView_CreateBuffer();
+   Recreates buffer with the current size.
+
+
+inline BITMAP *CBufView_GetBuffer() {if (!Buffer) CreateBuffer(); return Buffer;}
+   Returns the buffer bitmap.
+
+
+inline void CBufView_SetBuffer(BITMAP *Buf) {Buffer=Buf;}
+   Sets a new buffer bitmap. The old buffer is not destroyed.
+
+
+================================
+============ CGroup ============
+================================
+
+
+class CGroup:public CBufView
+{
+ public:
+  CGroup(int apx, int apy, int asx, int asy);
+  virtual ~CGroup();
+
+  virtual void HandleMouse(int mx, int my, int buttons);
+  virtual void MouseLost(int mx, int my, int buttons);
+  virtual void MouseGot(int mx, int my, int buttons);
+  virtual void HandleEvent(int Event, int Data=0);
+
+  virtual void PrepareDraw();
+  virtual void Redraw();
+
+  virtual void Action();
+
+  void Insert(CView *View);
+  void Remove(CView *View);
+
+  virtual void ScaleTo(int x, int y);
+  virtual BITMAP *GetMouse(int &rx, int &ry);
+
+ protected:
+  CView *First;
+  CView *Last;
+};
+
+
+
+CGroup is the base class for all classes that can contain other
+view objects.
+
+
+Constructor CGroup_CGroup(int apx, int apy, int asx, int asy);
+   Constructor of CGroup. A CGroup object with the position (apx;apy)
+   relative to the owner's view space and the size (asx;asy) is created.
+
+
+Destructor CGroup_Destructor
+   Destructor of CGroup. Destroy all childrens automatically.
+
+
+virtual void CGroup_HandleMouse(int mx, int my, int buttons);
+   Searches a child object to call it's HandleMouse method. If it's
+   another view object than in the call before, the MouseLost method of
+   the old and the MouseGot method of the new object is called.
+   (mx;my) is always converted to the view space of the group.
+   At the end CView::HandleMouse is called.
+
+
+virtual void CGroup_MouseLost(int mx, int my, int buttons);
+   If the group hast lost the mouse the child with the mouse focus has
+   lost it too. So it's MouseLost method must be called.
+
+
+virtual void CGroup_MouseGot(int mx, int my, int buttons);
+   The method searches a new child object to call it's MouseGot method.
+
+
+virtual void CGroup_HandleEvent(int Event, int Data=0);
+   A group call the HandleEvent of all children when a Event arrives.
+
+
+virtual void CGroup_PrepareDraw();
+   This method call the PrepareDraw methods of all children.
+
+
+virtual void CGroup_Redraw();
+   When a group should be redrawn it call all Draw methods of the children.
+
+
+virtual void CGroup_Action();
+   A group calls the Action method of all children. At last CView::Action
+   is called.
+
+
+void CGroup_Insert(CView *View);
+   Insert adds a new view object to the group. It's inserted at the top of
+   the linked list.
+
+
+void CGroup_Remove(CView *View);
+   The view object is searched in the linked list and removed, but not
+   destroyed.
+
+
+virtual void CGroup_ScaleTo(int x, int y);
+   When a group is scaled, all children have to be checked and scaled.
+   How they a scaled defines the ScaleMode variable of all views. It can
+   be changed with CView::SetScaleMode.
+
+
+virtual BITMAP *CGroup_GetMouse(int &rx, int &ry);
+   Returns the mouse cursor of the child with the mouse cursor. If this is 
+   NULL CView::GetMouse is called to get the mouse cursor of the group.
+
+
+CView *CGroup_First;
+CView *CGroup_Last;
+   The children of a group a inserted into a double linked list.
+   The First pointer points to the first (first drawn) view object in
+   the list. Last points to the last (last drawn) view object that on
+   top on the screen.
+   They children are linked with the Next and Prev variables inside the
+   view objects. Furthermore a Owner pointer points to the parent object
+   of a view object.
+
+
+ +--------------------+
+ | Group   First Last---------------------+
+ +------------|-------+                   |     
+       ^      v      ^---+-----------+    v
+       |   +-----------+ |+--------+ |+-----------+
+       |   | CView     | || CView  | || CView     |     
+       +-----Owner     | +--Owner  | +--Owner     |     
+           | Next-------->| Next----->| Next=NULL |
+           | Prev=NULL |
+           +-----------+  +--------+  +-----------+                                                                                         
+
+
+
+=================================
+============ CWindow ============
+=================================
+
+
+class CWindow:public CGroup
+{
+  CWindow(int apx, int apy, int asx, int asy);
+  virtual ~CWindow();
+
+  virtual void HandleEvent(int Event, int Data=0);
+
+  virtual void MoveTo(int x, int y);
+  virtual void ScaleTo(int x, int y);
+  int Run(int aForeground=0);
+  int Stop(int aValue=cmOk);
+  virtual int CanClose();
+  void Front();
+
+  virtual void Update(int ax, int ay, int asx, int asy);
+  virtual void RedrawOwner();
+  virtual void Draw();
+}
+
+
+
+CWindow is the base class of all top level objects in a CProgram
+object. Only CWindow object are allowed to be inserted into the
+main program. The word "window" doesn't mean that all CWindow object
+look like windows in other graphical user interfaces. The main menu
+for example is a window too, because it has to be inserted into
+the main program object.
+
+
+Constructor CWindow_CWindow(int apx, int apy, int asx, int asy);
+   Constructor of CWindow. Create a CWindow object.
+
+
+Destructor CWindow_Destructor
+   Destructor of CWindow. Destroys a CWindow object and remove it from
+   the owner group.
+
+
+virtual void CWindow_HandleEvent(int Event, int Data=0);
+   A CWindow object can handle some special event.
+
+cmClose: Calls CanClose and destroys the window if it can be closed.
+cmStop:  If the CWindow object is the currently running object it is stopped
+cmDrag:  The window is dragged. The Drag method is called.
+
+
+virtual void CWindow_MoveTo(int x, int y);
+   If a windows is moved, the owner's update method is called. So the background
+   is correctly updated.
+
+
+virtual void CWindow_ScaleTo(int x, int y);
+   If a window is scalled, the owner's update method is called. So the background
+   is correctly updated.
+
+
+int CWindow_Run(int aForegound=0);
+   A window can be run, so only the window can be controlled. Furthermore
+   only this window gets events. The other windows seem to be frozen. 
+   The return value can give information how the window has been stopped.
+   If aForeground is 1 only its Action method is called. If it is 0 the
+   program's Action is called.
+
+
+int CWindow_Stop(int aValue=cmOk);
+   If a running window should be stopped, Stop has to be called with
+   a parameter that is returned by Run later.
+
+
+virtual int CWindow_CanClose();
+   If CanClose returns 0, the window can't be closed the the cmClose 
+   event. Normally CanClose returns always 1.
+
+
+void CWindow_Front();
+   Front brings the window object to front.
+
+
+virtual void CWindow_Update(int ax, int ay, int asx, int asy);
+   Windows mustn't blit their buffer into the owner like CBufView object do
+   when Update is called. Otherwise the back-front order of the windows
+   will be destroy. It only calls the owner's update.
+
+
+virtual void CWindow_RedrawOwner();
+   This method doesn't do anything in CWindow.
+
+
+virtual void CWindow_Draw();
+   CWindow object need some different drawing technique than normal
+   views. So the draw method is overwritten.
+
+
+==================================
+============ CProgram ============
+==================================
+
+
+class CProgram:public CWindow
+{
+ public:
+  CProgram(int asx=320, int asy=200);
+  virtual ~CProgram();
+
+  virtual void HandleKey(char Char, char Scancode);
+  virtual void HandleEvent(int Event, int Data=0);
+
+  virtual void Draw();
+  virtual void Redraw();
+  virtual int SetVideoMode(int x, int y);
+  virtual void CreateBuffer();
+  virtual void Update(int ax, int ay, int asx, int asy);
+};
+
+
+
+CProgram is the base class for the main application object that
+contain the code to implement the functionality of a program.
+It should always be overwritten.
+
+
+Constructor CProgram_CProgram(int asx=320, int asy=200);
+   Creates a CProgram object and sets the graphic mode with the given
+   size. To work properly the Allegro time code must be initialized.
+
+
+Destructor CProgram_Destructor
+   Destroys the CProgram object.
+
+
+virtual void CProgram_HandleKey(char Char, char Scancode);
+   In debug mode the program can be stopped with escape.
+
+
+virtual void CProgram_HandleEvent(int Event, int Data=0);
+   CProgram objects stop their execution when a cmQuit event arrives.
+
+
+virtual void CProgram_Draw();
+   CProgram objects have their own drawing code that makes it possible
+   that the back to front order isn't disturbed. Furthermore children
+   can draw although they are behind other windows.
+
+
+virtual void CProgram_Redraw();
+   CProgram redraw their children without overdrawing. So no double
+   buffering is needed to get good display quality.
+
+
+virtual int CProgram_SetVideoMode(int x, int y);
+   The video mode can be changed on the fly. The screen is automatically
+   redrawn. If the video mode couldn't be set, 0 is return and the old
+   mode is set.
+
+
+virtual void CProgram_CreateBuffer();
+   CProgram hasn't it's own buffer but uses the video memory directly.
+
+
+virtual void CProgram_Update(int ax, int ay, int asx, int asy);
+   If Update is called the rectangle is inserted into the dirty rectangle
+   list. This list is redraw in the next program tick. During
+   a Redraw or Draw call, updates aren't valid. If a window want to
+   be updated it should do this in PrepareDraw or somewhere else, nut not
+   during the drawing itself.
+
+
+=================================
+============ CDialog ============
+=================================
+
+
+class CDialog:public CWindow
+{
+ public:
+  CDialog(int apx, int apy, int asx, int asy, char *aTitle="",
+          int aFlags=dlgDefault);
+  virtual ~CDialog();
+
+  virtual void HandleEvent(int Event, int Data=0);
+  virtual void HandleMouse(int mx, int my, int buttons);
+
+  void SetBackground(BITMAP *aTitle, BITMAP *aClient);
+  virtual void ScaleTo(int x, int y);
+  virtual void CorrectSize(int &x, int &y);
+  void Center();
+};
+
+
+
+CDialog is the base class for all modal and not modal windows with
+border, title bar and optional close button. They can be moved and scaled.
+To insert dialog element like buttons, you should insert them
+with "Client->Insert(..)" because you would have to add the size of the
+title bar the the y position otherwise.
+
+
+Constructor CDialog_CDialog(int apx, int apy, int asx, int asy, char *aTitle="", int aFlags=dlgDefault);
+   Creates a CDialog object. aTitle defines the text that will be shown
+   in the title bar. With flags the appearance of the CDialog object 
+   can be changed.
+
+
+const dlgClose;
+   If this flag is set, a close button is added. If it changed after
+   the creation of the window, it has no effect.
+
+
+const dlgCenter;
+   If this flag is set, the title text is centered in the title bar.
+
+
+const dlgDrag;
+   If this flag is set, the dialog can be moved by clicking on the title
+   bar.
+
+
+const dlgScale;
+   If this flag is set, the dialog can be scaled.
+
+
+const dlgDefault=dlgClose | dlgDrag;
+   This is the default flag value.
+
+
+Destructor CDialog_Destructor
+   Destroy a dialog, by removing it from the owner group.
+
+
+virtual void CDialog_HandleEvent(int Event, int Data=0);
+   A CDialog object can handle some special events:
+
+cmVidMode
+   If the video mode changes and the dialog wouldn't visible anymore,
+   the dialog is moved.
+
+cmOk:    Closes the dialog with cmOk as return value of Run.
+cmYes:   Closes the dialog with cmYes as return value of Run.
+cmNo:    Closes the dialog with cmNo as return value of Run.
+cmIgnore:Closes the dialog with cmIgnore as return value of Run.
+cmRetry: Closes the dialog with cmRetry as return value of Run.
+cmCancel:Closes the dialog with cmCancel as return value of Run.
+
+
+virtual void HandleMouse(int mx, int my, int buttons);
+   If you click on a dialog it is automatically brought to front.
+
+
+void CDialog_SetBackground(BITMAP *aTitle, BITMAP *aClient);
+   A dialog can get a custom background for the title bar and the client
+   area.
+
+
+virtual CDialog_void ScaleTo(int x, int y);
+   ScaleTo calls CorrectSize before calling CWindow::ScaleTo.
+
+
+virtual void CDialog_CorrectSize(int &x, int &y);
+   CorrectSize can be overwritten to control the maximal and minimal size
+   of a dialog.
+
+
+void CDialog_Center();
+   Center moves the dialog to the center of the screen.
+
+
+===================================
+============ Copyright ============
+===================================
+
+CView is copyrighted by Stefan Schimanski and Janko Heilgeist. It can be used
+in any program for free. The only thing you have to do is to add our
+names in your credits.
+
+If you have any question please send an email.
+
+Thanks
+
+
+For more information:
+
+1Stein@gmx.de
+Stefan.Schimanski@gmx.de
+Janko.Heilgeist@gmx.de
+http://1Stein.home.pages.de
+
+
+For Allegro related questions:
+
+shawn@talula.demon.co.uk
+http://www.talula.demon.co.uk/
+

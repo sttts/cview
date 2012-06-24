@@ -1,0 +1,116 @@
+Changes to CView WIP 12:
+
+ - Split the cmCommand enum into it's own file (v_comman.h).  This is so we
+   can later add some extra classes to help automate thier creation and use.
+
+ - Made CPicture flags to be a enum for type safety.
+
+ - Started work on the gui builder program (builder.cc).  It will make a
+   dialog and add buttons, but that's about all right now.  It will save the 
+   dialog to a standard file (build.cv) but the file format isn't fixed yet.
+   I'm trying very hard to make it human-readable so that we can use exactly 
+   the same functions for scripting.
+
+ - I think that the CInfoDlg and CPicDlg in the demo will be used in many
+   programs so I have moved it to a seperate file and included it in the
+   library.
+
+ - Added cmSerialize function that outputs class information to a char*.
+   This will be useful for saving/loading dialogs and also (hopefully) for
+   scripting.
+
+ - Changed CText and CFileSelecctor flags to seperate enum.
+
+ - Changed flags in v_msg.h and v_button.h to be a enum for some better type
+   safety.
+   
+ - Color schemes are reset at every mode change and color scheme change in
+   CView::HandleEvent function.  This makes sure that the color scheme is
+   always up to date.
+ 
+QUESTIONS:
+
+COMMENTS: 
+
+TODO:
+
+ - We should seriously consider putting the flags variables as nested in the
+   classes that use them.  This could greatly decrease name pollution 
+   although it may make some declarations verbose.
+
+ - Make special program background class.
+
+ - Make CPicture and CPicButton automatically change and update the bitmaps
+   to the correct color depth and palette whenever the video mode changes.
+
+ - Change TTFVIEW program to full ttf2pcx program.
+
+ - Add possibility to CVideoMode Dialog to not change the mode itself, but
+   only to return selection information.
+
+ - What about making an updir in file selector in top level show a list of
+   drives like it does in win95.
+
+ - We should add some more standard dialogs (color, toolbar, etc.)
+
+ - Write some more examples.
+ 
+ - Make some kind of interface for the creation/saving/loading of macros.
+
+ - The _whole_ screen is being redrawn when a list element from the file
+   selector is clicked.  Should this only be the list and some other objects
+   within the file selector.
+
+ - The list in the file selector will sometimes be selected and close the
+   box when scrolling the list.
+
+ - Maybe Combine HandleEvent and HandleAccel into the HandleEvent to cleanup 
+   the CView base class.
+
+ - Finish Cgfx::Bitmap type.
+
+ - Submenus don't properly resize when changing their style.
+
+ - Make button drawing style.
+
+ - Make console window.
+
+ - Change the name of the dialog border drawer to something more sensible.
+
+ - Change the string handling into a global class like the system bitmaps.
+
+ - Some of the file selector text looks wierd when scaling and unbuffered
+   windows.
+
+ - The of the file selector scrollbar still works wrong when resizing the 
+   window.
+
+ - It might be nice to be able to control the gui through scripts, i.e. make
+   and execute a gui interface using char strings, possibly loaded at run-time.
+   Make a simple interpreter to create and execute dialogs and get info out.  
+   I'll play with that idea a little bit...
+
+
+RULES:
+
+ - If an object accepts the focus it must appear differently on the screen than
+   when it doesn't have the focus.  The user must be able to tell which object 
+   has the focus.  We can drop this rule if we can put a yellow ring around the 
+   object with the focus.
+
+ - If an object does not draw the entire area given to it, the object must set
+   the transparant bit.
+
+ - Objects never draw onto Allegro's screen BITMAP, the only use the BITMAP
+   that they get grom the GetBitmap() fuction.
+ 
+ - Object may only draw to thier owners bitmap within a Draw function.  This
+   means that when using sub-buffering, object can only draw onto their own
+   bitmaps during a Draw function.
+
+ - User objects are responsible for any necessary changes in internal bitmaps
+   required after a run-time change in resolution or color depth.  They can
+   catch the cmVideoMode event to know when the video mode has changed and use
+   the normal Cgfx::Width(), Cgfx::Height() and Cgfx::Depth() functions to
+   find out what the mode has been changed to.
+   

@@ -1,0 +1,215 @@
+Changes to CView WIP 11:
+
+ - New function View_FixupBitmap which makes a copy of the bitmap in the
+   correct color depth.
+
+ - Sped up window selection.  Before when the active window was changed, the
+   whole progarm was redrawn.  Now it its only the newly active (on top)
+   window and whatever window was removed from the front.  This required a
+   new CGroup::Front function which moves some object to the front, and the
+   function to move a window to the front is CWindow::ToFront.
+   
+ - Removed the SetVideoMode function from CProgram because it can all be done
+   in View_SetVideoMode.
+
+ - If a CBufView gets it's buffer assigned to some external BITMAP* then it's
+   BufferType gets set to BufferExternal so we can keep track if we have to
+   release the internal buffer on object destruction.
+
+ - Added a CSystemBitmapButton object that acts like a CPicButton except it
+   takes a bmpBitmap instead of a BITMAP*.  This allows the object to be
+   correctly displayed even after video mode changes.
+
+ - Changed the DBLBUF macro to a static bool inside CProgram.  The user can
+   still change it in the header if they need to.
+
+ - New message cmWindowBufferMode that allows the user to change a windows
+   buffering mode (sub-buffering or full-buffering) at run time.
+
+ - Changed the demo to use a CVideoModeDlg instead of the big menu as before.
+   This dialog allows run-time changes in color depth!
+
+ - The message cmVideoMode now does nothing except notify the object that the
+   video mode has changed.  The data field points to nothing.
+
+ - Changed the order of flag checking in CView::SetScaleMode.  Object size
+   must be determined before object position so that positioning can depend on
+   object size.  This is necessary to place an object to the left of another
+   object.
+
+ - In v_msg.cc a malloc was matched with a delete!
+
+ - CPopupMenu and CMenuNode objects weren't being destroyed properly.  Now
+   they are.
+
+ - The menu is now a lot faster now because only the menu items that change
+   are redrawn.  I added CMenu::UpdateItem function that updates/redraws a
+   specific menu item, without affecting any other items.
+
+ - Changed double click handling for CList object.  It does no longer accept
+   double clicks, but a click on an allready accepted object acts like a
+   double click.  This makes the CList object easy to use even though double
+   clicks can be hard to generate with a heavy system load.
+
+ - Collected all the todo stuff from old changeXX.txt files that weren't done
+   allready and brought it into this file.
+
+ - Changed the HandleKey and HandleAccel functions to return a void* instead
+   of a bool.  This allows the function to return _which_ object in the
+   hierarchy actually used the key.
+
+ - Changed the HandleEvent functions to take a void* Data instead of an int
+   Data.  There will be less casting and it will be more portable to systems
+   with different int/pointer sizes.
+
+ - Default for a file selector is dlgEscape.
+
+ - Added a dlgEscape to dialog flags that stops a dialog when it gets an
+   escape key.  If that occurs, the CWindow::Run function will return
+   cmEscape.  If cmEscape is send to a window, it is handled as if a cmClose
+   was sent (i.e. returning cmCancel)
+
+ - Changed the colColor name to colSystemColor (a system color index) to avoid 
+   confusion with CColor which is the generic color type.
+
+ - Changed the system bitmap loading to use the current bitmap when loading
+   the system bitmaps.  Now CView makes *no* restrictions on the palette, and
+   will use the best colors possible for the sytem colors and all the
+   system bitmaps.  It also preserves the palette through mode changes.
+
+ - Made a palette_convert function in v_common.cc that can convert an 8 bit
+   bitmap to use another palette.
+
+ - Made a CMenuStyle object that works just like CDialogBorder objects to
+   control how a menu is drawn and give the user a choice.
+ 
+ - Centralized the mode/depth setting and releasing functions.
+
+ - Put all the system bitmap handling into a CSystemBitmap.
+
+ - Changed some types in v_msg.cc to stop warning about converting between
+   bmpBitmap and int.
+
+ - Removed all references to allegro.h in the header files.  Now we can slowly
+   remove the allegro.h from each .cc file, and move that functionality into
+   Cgfx class, encapsulating the graphic library functionality into Cgfx.
+   When we want to post CView to another target, we should only have to change
+   the Cgfx class.
+
+ - Changed color to enum for some type safety.  The enum has full 32 bit
+   range so it can contain all possible colors.
+
+ - Changed system font handling to make it more generic and added Font class 
+   to Cgfx interface.
+
+ - Fixed some size problems with the file selector with non-standard fonts.
+
+ - Made some minor name changes in CColorInterface to make it more consistant.
+
+ - Added some new classes for drawing dialog border styles.  Code structure
+   is very similar to the color scheme handling with an abstract base class
+   defining an interface and a wrapper class that acts like a reseatable
+   reference.  Made some different border style objects in the v_bordX.cc
+   files, including a rather pitiful attempts at a Win 3.1 and Win 95 style
+   border drawing.  Use a Win 3.1 style border for the TTFVIEW program so you 
+   can see what it looks like.  The border drawers are all in different
+   source files so they (hopefully) shouldn't be linked in unless they are
+   actually used.
+
+ - Started the Cgfx class which is wrappers for the functions to the graphic
+   library.  It's best to have all this stuff in one place to simplify 
+   debugging and to ease porting to other graphic envrionments, i.e. Windows,
+   GRX etc.  There are still a lot of function to go in there, but it's a 
+   start.  Right now, none of the functions are inline so that we can 
+   possibly avoid including <allegro.h> in our source files and only in the 
+   v_gfx.cc file.  This makes it easy to be sure what parts of the CView code
+   are dependant on Allegro.  Later we can inline everything and get the 
+   speed back.
+
+ - Modified the demo to show toggling between dialog border styles and color
+   schemes.
+   
+QUESTIONS:
+
+COMMENTS: 
+
+TODO:
+ 
+ - Make CPicture and CPicButton automatically change and update the bitmaps
+   to the correct color depth and palette whenever the video mode changes.
+
+ - Change TTFVIEW program to full ttf2pcx program.
+
+ - Add cmSerialize message that sends info about object to a char* so that
+   we can save and restore dialogs.  This could be used for dialog scripting 
+   and also as the basis for a gui builder.
+
+ - Add possibility to CVideoMode Dialog to not change the mode itself, but
+   only to return selection information.
+
+ - What about making an updir in file selector in top level show a list of
+   drives like it does in win95.
+
+ - We should add some more standard dialogs (color, toolbar, etc.)
+
+ - Write some more examples.
+ 
+ - Make some kind of interface for the creation/saving/loading of macros.
+
+ - The _whole_ screen is being redrawn when a list element from the file
+   selector is clicked.  Should this only be the list and some other objects
+   within the file selector.
+
+ - The list in the file selector will sometimes be selected and close the
+   box when scrolling the list.
+
+ - Maybe Combine HandleEvent and HandleAccel into the HandleEvent to cleanup 
+   the CView base class.
+
+ - Finish Cgfx::Bitmap type.
+
+ - Submenus don't properly resize when changing their style.
+
+ - Make button drawing style.
+
+ - Make console window.
+
+ - Change the name of the dialog border drawer to something more sensible.
+
+ - Change the string handling into a global class like the system bitmaps.
+
+ - Some of the file selector text looks wierd when scaling and unbuffered
+   windows.
+
+ - The of the file selector scrollbar still works wrong when resizing the 
+   window.
+
+ - It might be nice to be able to control the gui through scripts, i.e. make
+   and execute a gui interface using char strings, possibly loaded at run-time.
+   Make a simple interpreter to create and execute dialogs and get info out.  
+   I'll play with that idea a little bit...
+
+
+RULES:
+
+ - If an object accepts the focus it must appear differently on the screen than
+   when it doesn't have the focus.  The user must be able to tell which object 
+   has the focus.  We can drop this rule if we can put a yellow ring around the 
+   object with the focus.
+
+ - If an object does not draw the entire area given to it, the object must set
+   the transparant bit.
+
+ - Objects never draw onto Allegro's screen BITMAP, the only use the BITMAP
+   that they get grom the GetBitmap() fuction.
+ 
+ - Object may only draw to thier owners bitmap within a Draw function.  This
+   means that when using sub-buffering, object can only draw onto their own
+   bitmaps during a Draw function.
+
+ - User objects are responsible for any necessary changes in internal bitmaps
+   required after a run-time change in resolution or color depth.  They can
+   catch the cmVideoMode event to know when the video mode has changed and use
+   the normal Cgfx::Width(), Cgfx::Height() and Cgfx::Depth() functions to
+   find out what the mode has been changed to.
+   

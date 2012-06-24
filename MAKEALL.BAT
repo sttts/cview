@@ -1,0 +1,3 @@
+call makelib
+call makeex
+

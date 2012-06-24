@@ -1,0 +1,41 @@
+0 Ok
+1 Cancelar
+2 Si
+3 No
+4 Repetir
+5 Ignorar
+6 Archivo o camino invalido.
+7 El archivo debe existir.
+8 El archivo debe ser introducido.
+9 Cambio de unidad no permitido.
+10 Unidad invalida.
+11 Cambio de camino no permitido.
+12 No estan permitidos tipos de archivos individuales.
+13 No puedo crear el driectorio.
+14 Informacion
+15 Crear directorio
+16 Directorio
+17 Mejor
+18 Borar el archivo %s ?
+19 No puedo borrar el archivo.
+100 Archivo
+101 Nuevo
+102 Abrir...
+103 Salvar
+104 Savar como...
+109 Quitar
+110 Editar
+111 Cortar
+112 Copiar
+113 Pegar
+120 Ver
+190 Ayuda
+191 Contenidos
+192 Informacion
+300 Modo de video
+301 Quieres mantener el actual modo grafico?
+302 Modo de video
+303 No es posible el cambio del modo de video.
+400 Abrir archivo
+401 Abrir
+500 Esta deberia ser una linea tan larga que necesita mas de una linea para ser mostrada en un objeto CText.

@@ -1,0 +1,69 @@
+LIBNAME = libcview.a
+
+OBJS=v_base.o\
+	v_bord1.o\
+	v_bord2.o\
+	v_bord3.o\
+	v_bord4.o\
+	v_border.o\
+	v_button.o\
+	v_check.o\
+	v_color.o\
+	v_combo.o\
+	v_common.o\
+	v_dialog.o\
+	v_file.o\
+	v_gfx.o\
+	v_infdlg.o\
+	v_input.o\
+	v_list.o\
+	v_load.o\
+	v_macro.o\
+	v_menu.o\
+	v_menus1.o\
+	v_menust.o\
+	v_mouse.o\
+	v_msg.o\
+	v_picdlg.o\
+	v_pictur.o\
+	v_prog.o\
+	v_proces.o\
+	v_radio.o\
+	v_save.o\
+	v_save1.o\
+	v_scroll.o\
+	v_string.o\
+	v_sysbit.o\
+	v_system.o\
+	v_text.o\
+	v_utils.o\
+	v_vidmod.o
+
+INCLUDE_DIRS = ../include
+
+CC = gcc
+AR = ar
+
+OPTIONS = -O2\
+	-W\
+	-Wall\
+	-fomit-frame-pointer\
+	-ffast-math\
+	-funsigned-char\
+	-s
+
+INCLUDES = $(addprefix -I,$(INCLUDE_DIRS))
+
+all : $(LIBNAME)
+
+$(LIBNAME) : $(OBJS)
+	$(AR) rs $@ $^
+	move $(LIBNAME) ..\\lib
+
+%o : %cc
+	$(CC) -c $(INCLUDES) $(OPTIONS) $<
+
+%o : %c
+	$(CC) -c $(INCLUDES) $(OPTIONS) $<
+
+
